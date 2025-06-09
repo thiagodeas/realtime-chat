@@ -39,7 +39,7 @@ function App() {
 
   if (!nameSet) {
     return (
-      <div className="p-4 max-w-md mx-auto">
+      <div className="flex items-center justify-center h-screen w-screen bg-[#253659]">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -48,12 +48,20 @@ function App() {
           className="flex gap-2"
         >
           <input
-            className="border rounded p-2 flex-1"
+            className="border rounded p-2 w-80 focus:outline-none bg-gray-200"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Digite seu nome..."
           />
-          <button className="bg-blue-500 text-white px-4 rounded" type="submit">
+          <button
+            className={
+              name.length < 3
+                ? "bg-gray-300 text-gray-500 font-bold px-4 rounded cursor-not-allowed"
+                : "bg-[#04BF9D] text-white font-bold px-4 rounded hover:bg-[#03A696] transition-all duration-300 cursor-pointer"
+            }
+            type="submit"
+            disabled={name.length < 3}
+          >
             Entrar
           </button>
         </form>
@@ -62,34 +70,49 @@ function App() {
   }
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <ul className="mb-4 border rounded p-2 h-64 overflow-y-auto bg-gray-50">
+    <div className="flex flex-col items-center justify-center p-6 h-screen bg-[#253659]">
+      <ul className="mb-4 border rounded p-4 h-4/5 w-3/4 overflow-y-auto bg-gray-200 flex flex-col gap-2">
         {messages.map((msg, idx) => (
           <li
             key={idx}
-            className={`mb-1 ${
+            className={`flex ${
               msg.name === name
-                ? "text-right bg-blue-100"
+                ? "justify-end"
                 : msg.name === "Sistema"
-                ? "text-center text-gray-500"
-                : "text-left bg-gray-200"
-            } p-1 rounded`}
+                ? "justify-center"
+                : "justify-start"
+            }`}
           >
-            {msg.name !== "Sistema" && (
-              <span className="font-bold">{msg.name}: </span>
-            )}
-            {msg.message}
+            <div
+              className={`max-w-[70%] p-2 rounded break-words ${
+                msg.name === name
+                  ? "bg-[#F27457] text-right"
+                  : msg.name === "Sistema"
+                  ? "bg-transparent text-gray-500 text-center"
+                  : "bg-gray-300 text-left"
+              }`}
+            >
+              {msg.name !== "Sistema" && (
+                <span className={msg.name === name ? "font-bold" : ""}>
+                  {msg.name}:{" "}
+                </span>
+              )}
+              {msg.message}
+            </div>
           </li>
         ))}
       </ul>
-      <form onSubmit={sendMessage} className="flex gap-2">
+      <form onSubmit={sendMessage} className="flex gap-2 w-3/4">
         <input
-          className="border rounded p-2 flex-1"
+          className="border rounded p-2 w-full bg-gray-200 outline-none"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Digite sua mensagem..."
         />
-        <button className="bg-blue-500 text-white px-4 rounded" type="submit">
+        <button
+          className="bg-[#04BF9D] text-[#253659] font-bold px-4 rounded cursor-pointer hover:text-white transition-all duration-500"
+          type="submit"
+        >
           Enviar
         </button>
       </form>
