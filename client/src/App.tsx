@@ -1,35 +1,54 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useRef, useState } from "react";
+import "./App.css";
+import { io, type Socket } from "socket.io-client";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [messages, setMessages] = useState<string[]>([]);
+  const [input, setInput] = useState("");
+  const socketRef = useRef<Socket | null>(null);
+
+  useEffect(() => {
+    socketRef.current = io("http://localhost:3001");
+
+    socketRef.current.on("chat message", (msg: string) => {
+      setMessages((prev) => [...prev, msg]);
+    });
+
+    return () => {
+      socketRef.current?.disconnect();
+    };
+  }, []);
+
+  const sendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (input.trim() && socketRef.current) {
+      socketRef.current.emit("chat message", input);
+      setInput("");
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div className="p-4 max-w-md mx-auto">
+      <ul className="mb-4 border rounded p-2 h-64 overflow-y-auto bg-gray-50">
+        {messages.map((msg, idx) => (
+          <li key={idx} className="mb-1">
+            {msg}
+          </li>
+        ))}
+      </ul>
+      <form onSubmit={sendMessage} className="flex gap-2">
+        <input
+          className="border rounded p-2 flex-1"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Digite sua mensagem..."
+        />
+        <button className="bg-blue-500 text-white px-4 rounded" type="submit">
+          Enviar
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+      </form>
+    </div>
+  );
 }
 
-export default App
+export default App;
