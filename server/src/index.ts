@@ -19,8 +19,8 @@ io.on("connection", (socket: Socket) => {
     io.emit("Mensagem do sistema: ", `${userName} entrou no chat.`);
   });
 
-  socket.on("chat message", (msg: string) => {
-    io.emit("chat message", msg);
+  socket.on("chat message", (data: { name: string; message: string }) => {
+    io.emit("chat message", data);
   });
 
   socket.on("disconnect", () => {
