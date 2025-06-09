@@ -1,6 +1,6 @@
 import express from "express";
 import { createServer } from "http";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 
 const app = express();
 const httpServer = createServer(app);
@@ -11,15 +11,15 @@ const io = new Server(httpServer, {
   },
 });
 
-io.on("connection", (socket) => {
-  let userName = "";
+io.on("connection", (socket: Socket) => {
+  let userName: string = "";
 
-  socket.on("join", (name) => {
+  socket.on("join", (name: string) => {
     userName = name;
     io.emit("Mensagem do sistema: ", `${userName} entrou no chat.`);
   });
 
-  socket.on("chat message", (msg) => {
+  socket.on("chat message", (msg: string) => {
     io.emit("chat message", msg);
   });
 
