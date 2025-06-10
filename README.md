@@ -61,6 +61,7 @@ This project is a simple realtime chat application built with React, TypeScript,
 - Enter your message and click "Enviar" to send.
 - All messages are broadcast to connected users in realtime.
 - System messages notify when users join or leave.
+- When a user is typing, others see a "Usuário está digitando..." notification.
 
 ## Technologies Used
 
