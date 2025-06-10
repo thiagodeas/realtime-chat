@@ -23,6 +23,14 @@ io.on("connection", (socket: Socket) => {
     io.emit("chat message", data);
   });
 
+  socket.on("typing", () => {
+    socket.broadcast.emit("typing", userName);
+  });
+
+  socket.on("stop typing", () => {
+    socket.broadcast.emit("stop typing", userName);
+  });
+
   socket.on("disconnect", () => {
     if (userName) {
       io.emit("Mensagem do sistema: ", `${userName} saiu do chat.`);
