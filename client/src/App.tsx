@@ -4,11 +4,13 @@ import { io, type Socket } from "socket.io-client";
 import type { ChatMessage } from "./types";
 
 function App() {
+  const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [name, setName] = useState("");
   const [nameSet, setNameSet] = useState(false);
   const socketRef = useRef<Socket | null>(null);
+  const typingTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!nameSet) return;
@@ -24,6 +26,14 @@ function App() {
       setMessages((prev) => [...prev, { name: "Sistema", message: msg }]);
     });
 
+    socketRef.current.on("typing", (user: string) => {
+      setTypingUsers((prev) => (prev.includes(user) ? prev : [...prev, user]));
+    });
+
+    socketRef.current.on("stop typing", (user: string) => {
+      setTypingUsers((prev) => prev.filter((u) => u !== user));
+    });
+
     return () => {
       socketRef.current?.disconnect();
     };
@@ -34,6 +44,19 @@ function App() {
     if (input.trim() && socketRef.current) {
       socketRef.current.emit("chat message", { name, message: input });
       setInput("");
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+
+    if (socketRef.current) {
+      socketRef.current.emit("typing");
+
+      if (typingTimeout.current) clearTimeout(typingTimeout.current);
+      typingTimeout.current = setTimeout(() => {
+        socketRef.current?.emit("stop typing");
+      }, 1000);
     }
   };
 
@@ -101,12 +124,22 @@ function App() {
             </div>
           </li>
         ))}
+        <div>
+          {(() => {
+            const outrosDigitando = typingUsers.filter((u) => u !== name);
+            if (outrosDigitando.length === 0) return null;
+            return `${outrosDigitando.join(", ")} ${
+              outrosDigitando.length === 1 ? "está" : "estão"
+            } digitando...`;
+          })()}
+        </div>
       </ul>
+
       <form onSubmit={sendMessage} className="flex gap-2 w-3/4">
         <input
           className="border rounded p-2 w-full bg-gray-200 outline-none"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={handleInputChange}
           placeholder="Digite sua mensagem..."
         />
         <button
