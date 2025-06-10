@@ -11,6 +11,7 @@ This project is a simple realtime chat application built with React, TypeScript,
 
 - Realtime messaging between users.
 - System notifications when users join or leave the chat.
+- User typing notifications ("Usuário está digitando...") in realtime.
 - Responsive UI.
 
 ## Getting Started
@@ -25,8 +26,8 @@ This project is a simple realtime chat application built with React, TypeScript,
 1. **Clone the repository:**
 
    ```sh
-   git clone <your-repo-url>
-   cd websocket
+   git clone <https://github.com/thiagodeas/realtime-chat.git>
+   cd realtime-chat
    ```
 
 2. **Install dependencies:**
